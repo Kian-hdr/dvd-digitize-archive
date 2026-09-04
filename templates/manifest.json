@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "root": ".",
+  "updated_at": null,
+  "discs": [],
+  "titles": [],
+  "read_errors": [],
+  "verification_notes": [],
+  "remaining_work": ["Detect and confirm a disc before acquisition"]
+}
