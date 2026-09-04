@@ -31,12 +31,39 @@ Mac in isolated temporary directories. It did not simulate an unauthenticated us
 installing Python/Homebrew from scratch or prove another assistant's discovery UI.
 System dependencies and the existing global skill/configuration were preserved.
 
+## Public distribution and setup rehearsal
+
+The repository page and main-branch ZIP returned HTTP 200 without authentication.
+ZIP CRC validation passed and all 26 packaged file contents matched commit
+`26963b56144bdf2db8c27547e2a200e933405866`.
+
+A fresh HTTPS clone with Git credential helpers disabled succeeded. From that
+public clone, the setup prompt's prerequisite checks, 30 tests, synthetic smoke
+example, dry-run install and actual new-directory install all passed. The
+installed copy passed its prerequisite check, smoke example and 30 tests; a repeat
+installation was refused without changing the existing skill. The anonymously
+downloaded ZIP also passed prerequisite and synthetic-media checks after extraction.
+All of this used temporary directories, which were removed after validation.
+
+This is an executed rehearsal of the prompt's local commands, not a claim that an
+arbitrary AI assistant followed the prompt autonomously or that assistant discovery
+was verified. Public download checks are point-in-time evidence.
+
 ## Automated checks
 
 [GitHub Actions](https://github.com/Kian-hdr/dvd-digitize-archive/actions/workflows/validate.yml)
 runs the prerequisite check, 30 regression tests and synthetic media smoke test on
-macOS and Ubuntu with Python 3.9. Consult the actual run result before treating
-another operating system as tested. CI does not access an optical drive or GUI.
+macOS and Ubuntu with Python 3.9. [Release run 33918738918](https://github.com/Kian-hdr/dvd-digitize-archive/actions/runs/33918738918)
+passed both jobs at commit `26963b56144bdf2db8c27547e2a200e933405866`:
+
+| Runner | Python | FFmpeg | Result |
+|---|---|---|---|
+| macOS, Darwin 25.5.0, arm64 | 3.9.13 | 8.1.2 | 30 tests and synthetic media smoke passed |
+| Ubuntu, Linux x86_64 | 3.9.25 | 6.1.1 | 30 tests and synthetic media smoke passed |
+
+The helper/toolchain tests are verified on both CI hosts; Linux physical-DVD work
+remains experimental. CI does not access an optical drive or GUI. Later changes to
+this validation record do not alter the tested scripts or workflow.
 
 ## Not verified by these tests
 
