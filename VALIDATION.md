@@ -1,5 +1,20 @@
 # Validation
 
+## Local 1.1.1 hotfix validation: 2026-09-29
+
+The 1.1.0 public [CI run](https://github.com/Kian-hdr/dvd-digitize-archive/actions/runs/36621916970)
+failed on both macOS and Ubuntu at `test_no_private_paths_or_key_material`.
+All new media-helper tests passed. The scanner then tried to decode a generated
+`scripts/__pycache__/*.pyc` file as UTF-8 and raised `UnicodeDecodeError`.
+The 1.1.1 test change limits that scan to source-text extensions.
+
+Locally, an intentionally invalid bytecode fixture reproduced the prior failure.
+The complete 41-test suite passed with the same fixture after the correction;
+the disposable fixture was removed afterward. The skill validator, synthetic
+smoke test, JSON parse, Python compilation, and diff check also passed.
+Public CI for 1.1.1 was pending when this source was prepared. No physical-disc
+or player test was performed for this test-only hotfix.
+
 ## Local 1.1.0 candidate validation: 2026-09-29
 
 Environment: macOS host (Darwin 27.0.0, arm64), Python 3.9.6,
@@ -37,8 +52,9 @@ quality or HDR;
 original multichannel/immersive audio preservation; subtitle OCR; real episode
 mapping; QuickTime or TV playback; or another assistant's installation/discovery.
 The setup smoke test still exercises H.264; separate tests cover short synthetic
-HEVC Main 8-bit and Main10 encodes. The new scripts have not yet run in public CI
-or against physical media.
+HEVC Main 8-bit and Main10 encodes. The media-helper tests passed in public CI,
+but the overall 1.1.0 run failed at the bytecode scanner as described above.
+No physical-media trial was performed.
 
 ## Local release validation: 2026-09-04
 

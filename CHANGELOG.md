@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 - 2026-09-29
+
+- Restrict the privacy scan to source-text files so generated Python bytecode
+  cannot cause a Unicode decode error on clean CI runners. No media workflow,
+  helper, or setup behavior changed.
+
 ## 1.1.0 - 2026-09-29
 
 - Extend the public workflow to DVD, Blu-ray and UHD Blu-ray with structural

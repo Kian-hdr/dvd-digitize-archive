@@ -199,11 +199,13 @@ class PackageTests(unittest.TestCase):
     def test_no_private_paths_or_key_material(self):
         patterns = [r'/Users/[^/\s]+/', r'/home/[^/\s]+/', r'-----BEGIN .*PRIVATE KEY-----',
                     r'gh[pousr]_[A-Za-z0-9]{30,}', r'AKIA[A-Z0-9]{16}']
+        source_text_suffixes = {'.md', '.py', '.json', '.yaml', '.yml', '.zsh'}
         for directory in ('references', 'agents', 'templates', 'scripts'):
             for path in (ROOT / directory).rglob('*'):
-                if path.is_file():
+                if path.is_file() and path.suffix in source_text_suffixes:
                     for pattern in patterns:
-                        self.assertIsNone(re.search(pattern, path.read_text()), str(path))
+                        self.assertIsNone(re.search(pattern, path.read_text(encoding='utf-8')),
+                                          str(path))
         for name in ('SKILL.md', 'README.md', 'SETUP_PROMPT.md', 'VALIDATION.md',
                      'CHANGELOG.md', 'ATTRIBUTION.md'):
             for pattern in patterns:
