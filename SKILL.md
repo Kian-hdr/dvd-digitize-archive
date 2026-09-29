@@ -1,99 +1,42 @@
 ---
 name: dvd-digitize-archive
-description: Digitize locally inserted DVDs into verified archival MKV and compatible MP4 files, show live terminal rip progress, safely resume documented workspaces, and coordinate parallel post-rip and selectable-subtitle processing. Use for DVD ripping, remuxing, transcoding, episode identification, subtitle OCR or translation, disc-by-disc continuation, preservation logging, and bounded DVD worker orchestration; do not use for Blu-ray, streaming downloads, or general video editing.
+description: Digitize locally inserted DVD, Blu-ray, and UHD Blu-ray discs into verified original-stream MKVs and compatible MP4s. Use for title and episode mapping, audio/subtitle preservation, TV playback, franchise watch order, and safe resumption; not for streaming downloads or general video editing.
 ---
 
-# DVD Digitize and Archive
+# Optical Disc Digitize and Archive
 
-Create a repeatable, evidence-based local DVD archive. Preserve source streams in MKV, create compatible H.264/AAC playback copies where appropriate, verify every output, and leave a workspace another task can resume safely.
+Create one verified final MP4 per established episode or film. Keep each complete original-stream MKV watchable under `Original_MKV/` while its MP4 is made and validated. Retain original MKVs and full-disc backups according to the user's storage policy; do not infer permission to delete them. This package supplies workflows and helpers, not optical-reader software, media, keys, or player compatibility.
 
-## Public package and host adaptation
+## Route the task
 
-Read `README.md` for installation and `VALIDATION.md` for evidence boundaries.
-Resolve the skill root from this file's actual location. No creator-specific
-workspace, helper, account, terminal integration, or credential is required.
-The complete scripts and generic templates are bundled alongside this file.
-Use only media the user is authorized to process.
+1. Inspect the mounted disc and candidate workspace without writing. Use `scripts/disc_snapshot.py MOUNT_PATH` for a structural inventory and fingerprint, then save its JSON under disc-specific `Logs/` after selecting a workspace. A structural fingerprint helps compare media but is not a unique physical-disc serial. Confirm the optical drive index from a current reader scan.
+2. Use the supplied workspace. Otherwise search the user's selected media location for a matching manifest, or ask where to create one. Do not merge by title or volume label alone. On resume, reconcile `WORKFLOW.md`, `STATUS.md`, `manifest.json`, disc logs, and actual outputs; fresh probes outrank stale status. Establish audio, subtitle, source-retention, and target-player policy before acquisition.
+3. Report disc format and identity evidence, workspace, proposed disc number, and next action. Obtain explicit confirmation that the correct physical disc is inserted before each new acquisition or controlled re-read. Local inspection and post-processing of a verified source can proceed separately.
+4. Read [workspace standard](references/workspace-standard.md) for records, [processing and verification](references/processing-and-verification.md) before acquisition or conversion, [Blu-ray decisions](references/blu-ray.md) for Blu-ray/UHD, and [TV playback](references/tv-playback.md) for a player-targeted MP4. Read [watch order](references/franchise-watch-order.md) for mixed film/series collections, [subtitles](references/selectable-subtitles.md) for OCR/translation, and [parallel orchestration](references/parallel-orchestration.md) for concurrent work. Use [live progress](references/live-progress-monitor.md) during active processing when useful.
 
-Use the current assistant's visible terminal if supported. Otherwise run the
-read-only monitor in the current shell or provide the resolved command for the
-user; do not invent access to an app terminal. On non-macOS hosts, substitute a
-named available target player for playback checks and record QuickTime as untested.
-If a required independent reviewer or GUI is unavailable, leave that gate pending.
+## Operational rules
 
-The bundled Python helpers require Python 3.9+. The zsh entry points require zsh
-and invoke the same Python monitor; `python3 scripts/monitor.py` also works directly.
-Setup and synthetic validation never authorize physical-disc acquisition.
+- Work inside the selected workspace except for authorized tool installation. Use English operational names and decimal SI sizes. Preserve unrelated files. Never overwrite a source or verified output; make a new candidate and verify it before reversible promotion.
+- Expose each complete, verified source title MKV under `Original_MKV/` before waiting for its MP4. A same-volume hardlink to `.work/` avoids duplicating bytes while preserving the active source path; otherwise verify a copy. Record all paths and relationships. Exclude partial encodes and test clips. Deleting one hardlink does not necessarily reclaim space.
+- One acquisition process per optical drive. A verified local source may be processed while another disc is acquired, with separate paths and one owner of shared records. Do not eject while verification or a required read remains open.
+- Prefer a functioning official MakeMKV installation when suitable. DVD `dvdbackup` plus verified stream-copy remux remains an alternative. A title MKV is not a full-disc/menu backup. For protected Blu-ray/UHD that the available drive or tool cannot read, record the exact failure and stop. Do not change drive firmware, disable OS security, acquire licenses, or bypass access gates speculatively.
+- Preserve source audio needed by the user's policy in the original MKV. For a common English/German TV profile, `compatible_encode.py` selects one verified main mix per available language as AAC-LC in MP4, retaining each selected source's channel count. English is first/default when present; it never invents a missing language. Other original mixes can be kept in verified `.mka` sidecars or in the MKV. This profile is configurable, not a universal language or deletion policy. Use `--audio-language all` only when every source language is requested, and `--all-source-streams` only when every mix should appear separately in MP4.
+- For a confirmed source with zero audio streams, `compatible_encode.py --video-only` makes a video-only MP4 and rejects sources that have audio. Never add fake silent audio or omit a real source track.
+- For SDR 4:2:0 sources, start a real-source pilot with source-matched HEVC Main 8-bit or Main10 10-bit in MP4 (`hvc1`) at x265 CRF 18/preset medium. Compare against source and test the target player before batching. Keep resolution, sample aspect ratio, frame rate, channel count, and known color tags. H.264 is a documented fallback for an 8-bit source and a player that needs it. HDR, wide color, 3D, unusual chroma, and interlaced material need a separate feature-preserving plan.
+- Lossy HEVC cannot prove zero quality loss. Verify exact episode/cut and frame order, full decode, stream integrity, and reviewed source-versus-output samples, including dark, grainy, and moving scenes. Record timestamps and sampling limits. Keep a bit-identical source when exact fidelity is required.
+- Preserve DVD VobSub and Blu-ray PGS in the working source while needed. Selectable MP4 text requires verified source text or reviewed OCR. Do not burn subtitles or invent source-language tracks. Mark translations as derived.
+- Establish titles, version, and episode order from disc structure, visible content, and reliable source evidence. Duration, filename, playlist number, or adjacent segments alone are insufficient. Join only verified pieces of the same official episode; keep separately numbered `Part I/II/III` episodes separate. Stop at ambiguity that could produce a wrong title, language, playlist, join, or destructive action.
 
-## Start safely
+## Reuse the helpers
 
-1. Identify the mounted optical disc and candidate workspace without altering either.
-2. If the user supplies a workspace, use it. Otherwise search the user's Movies directory for a workspace whose manifest disc IDs or title match the disc. Never merge based on title alone when identity is uncertain.
-3. When a candidate exists, read `WORKFLOW.md`, `STATUS.md`, `manifest.json`, and all relevant disc logs, then inspect actual files. Files on disk outrank recorded status.
-4. If no matching workspace exists, identify the film or series only from disc evidence and reliable sources. Ask for a title or destination only if it cannot be established safely. Create a filesystem-safe English folder under the user's Movies directory by default.
-5. Before reading a new disc, report the detected disc label and ID, selected workspace, planned disc number, and intended next action. Begin the rip only after explicit confirmation that the correct disc is inserted.
+- `scripts/makemkv_job.py` previews or runs explicit MakeMKV scan, info, selected-title, and Blu-ray backup jobs with source-specific logs. Preview first; run an optical read only after disc confirmation. Verify selected title/playlist IDs. It refuses existing outputs and does not offer an `all` shortcut. Verified decrypted backups can be used for later local `info` and title jobs.
+- `scripts/media_audit.py FILE --report REPORT.json` records compact ffprobe evidence. Add `--decode`, `--count-subtitles`, `--hash`, `--compare-source SOURCE --source-video-stream N`, or `--tv-baseline` for relevant gates. Its `--allow-surround-default` and `--allow-silent-source` checks require source comparison and never establish physical player acceptance.
+- `scripts/compare_audio_stream.py SOURCE N EXPORT N --report REPORT.json` compares a retained copied audio stream or sidecar with its source payload and channel metadata. Label derived AAC tracks separately.
+- `scripts/compatible_encode.py SOURCE CANDIDATE.mp4 --video-stream N --audio-stream N` previews a source-matched SDR encode. Review language selection, stream IDs, codec, color, and target player before `--sdr-confirmed --run`. Use `--video-only` only for a verified silent source and `--video-codec h264` only for a documented 8-bit fallback.
+- `scripts/join_episode_parts.py` preflights technically matching MP4 pieces for one verified episode and writes a new candidate. It cannot prove story identity, trim repeated material, or establish playback quality.
+- `scripts/media_filename.py` forms episode-first or film stems from verified metadata. `scripts/build_watch_view.py WORKSPACE` previews, and `--run` builds, a numbered hardlink playback view from `watch_order.json`; verify actual player order separately.
+- `scripts/live_project_monitor.zsh WORKSPACE` or `scripts/monitor.py WORKSPACE` shows read-only, advisory progress during active work. Its process and size observations do not prove completion. Start it once per visible task terminal when useful; do not restart healthy media work for a display.
 
-Read [references/workspace-standard.md](references/workspace-standard.md) when creating or repairing a workspace. Read [references/processing-and-verification.md](references/processing-and-verification.md) before ripping, remuxing, transcoding, identifying titles, or marking outputs verified.
+## Completion
 
-For every new or resumed DVD workspace, also read [references/live-progress-monitor.md](references/live-progress-monitor.md). At the beginning of the task, start or attach one bundled read-only project monitor in the current visible assistant task terminal. Use `scripts/live_project_monitor.zsh` by default. It stays alive while idle and observes workspace growth across later phases without being tied to one disc number. Process detection is advisory and does not establish the exact phase or output path. Never open Terminal.app or another external terminal unless the user explicitly requests it. Never restart or interrupt healthy work merely to add or repair the monitor.
-
-Immediately after starting or attaching the monitor, also post a copy-ready `zsh` code block in chat that runs the same adaptive monitor from any local terminal. Resolve the actual absolute workspace and do not give placeholders. Use the fixed-disc monitor only when the user explicitly asks for a monitor limited to one acquisition.
-
-When the user requests optional MP4 subtitles, subtitle OCR, audio transcription, or translated subtitle tracks, read both [references/selectable-subtitles.md](references/selectable-subtitles.md) and [references/parallel-orchestration.md](references/parallel-orchestration.md). Use the coordinated subtitle workflow by default, including source reconstruction and requested translation; use sequential roles if delegation is unavailable. Treat derived translations as new authored metadata with documented provenance, not as evidence that the DVD contained that language.
-
-When the user requests a swarm, concurrent discs, or parallel processing of independent titles, read [references/parallel-orchestration.md](references/parallel-orchestration.md). Keep optical-disc acquisition single-reader even when later phases run concurrently.
-
-## Core invariants
-
-- Use English for every operational surface created by this skill, regardless of the language of the user's request. This includes terminal labels and phase values, live-monitor output, chat progress reports, workspace documentation, manifests, logs, filenames, descriptions, verification reports, warnings, and handoff messages. Non-English text is allowed only inside media-specific content whose language is verified or explicitly derived, such as a documented German subtitle translation. Do not localize the terminal monitor or operational status messages into German.
-- Present storage sizes and throughput in automatically selected decimal SI units: `B`, `KB`, `MB`, `GB`, or `TB`, using powers of 1000. Do not show long raw-byte counts or binary `KiB`, `MiB`, `GiB`, or `TiB` values in normal user-facing terminal or chat progress. Raw byte counts may remain in machine-readable manifests and technical evidence when exactness is required.
-- Work only inside the selected media workspace, except for safe installation of an explicitly authorized required application from an official source.
-- Never delete or overwrite source material or a verified output. Create corrected files separately and quarantine obsolete items before permanent deletion.
-- Prefer MakeMKV when safely available from its official source. A lossless `dvdbackup`/`libdvdcss` extraction followed by a stream-copy Matroska remux is an acceptable local alternative.
-- Archive MKVs retain original video, relevant audio, subtitles, chapters, and verified language tags without re-encoding.
-- Compatible MP4 uses H.264 `CRF 18`, `preset medium`, `yuv420p`, and AAC unless existing workspace instructions establish another verified setting.
-- Preserve confirmed frame rate and display geometry. Deinterlace only after actual interlacing is technically confirmed. Never stretch or crop merely to fill a screen.
-- Preserve bitmap DVD subtitles in MKV. Put selectable subtitles in MP4 only after reliable conversion and verification; never silently invent OCR or burn subtitles into the picture.
-- Label source audio and subtitle languages only when verified directly from the disc or source files. English is the default for folders, filenames, descriptions, metadata, documentation, and logs. A user-requested translated subtitle may use its target language only when clearly recorded as a derived translation; it must never be represented as an original DVD track, dub, or official-language release.
-- Do not identify episodes, story parts, extras, or order from filename, duration, or alphabetical order alone. Use DVD IFO/PGC/cell structure, visible content, runtimes, supplied packaging, and reliable episode sources together.
-- Stop at ambiguity that could cause a wrong title, order, language, join, split, or destructive action. Record the specific uncertainty.
-
-## Operating modes
-
-### Resume
-
-Reconcile documentation and files, verify existing claimed outputs before trusting them, continue only incomplete work, and never re-encode a verified deliverable merely to reorganize it.
-
-### New title
-
-Create the standard workspace and documentation before the first rip. Record the first disc ID immediately. For a series, use season folders only after the season is established; otherwise use a factual provisional folder and update it without inventing metadata.
-
-### Next disc
-
-Compare the inserted disc ID against every manifest entry. Refuse accidental duplicates unless the user explicitly requests a controlled re-read. Only one process may read the optical drive at a time. A completed local mirror from an earlier disc may be analyzed, converted, or verified while the next confirmed disc is acquired, provided workers have non-overlapping paths and shared records remain serialized. Stop and ask before every new physical disc.
-
-### Parallel orchestration
-
-Use bounded parallelism only for independent work with explicit ownership. One coordinator owns the dependency graph, output-path reservations, progress synthesis, and all writes to shared status, manifest, and disc logs. Workers return structured evidence and never claim completion or edit shared records themselves. Prefer process-level concurrency for FFmpeg and other heavy media work; agents are most useful for coordinating independent analysis, identification, verification, and exception handling. If delegation is unavailable, apply the same ownership and concurrency rules locally.
-
-### Selectable subtitles
-
-Add optional subtitles only to compatible playback copies unless the user explicitly requests otherwise. Preserve archival MKVs and existing verified video/audio streams. Prefer original text subtitles, then verified OCR of original bitmap subtitles, and use audio transcription only when no reliable source subtitle exists. Embed verified text tracks as selectable MP4 subtitles without burning them into the image.
-
-Use coordinator-led roles for every subtitle workflow, with agents when available and sequential work otherwise. Split OCR review, source-language correction, and translation at verified chapter or scene boundaries into uniquely owned clusters. Give each cluster limited adjacent context and a shared glossary, but never let overlapping context create duplicate output cues. Start with at most two simultaneous model-intensive clusters, measure throughput and system pressure, and raise or lower concurrency only when evidence supports it. A healthy process already in progress keeps running; do not restart it merely to adopt the swarm. The coordinator alone merges clusters, reserves final paths, writes shared documentation, and decides whether the result passes verification.
-
-Pilot one episode before batch processing. Use separate workers for source extraction or OCR, source-language review, target-language translation, timing and continuity checks, and container/QuickTime verification. No worker may verify its own authored cluster as the sole reviewer. Batch remaining episodes only after the pilot passes timing, language metadata, switching, disabling, chapters, unchanged video/audio, and actual QuickTime playback.
-
-## Progress and completion
-
-Send compact progress at start, about every five minutes, at roughly each measured 10-point increase, at phase changes, and immediately on errors or stalls. Base percentages and time ranges on selected-title data size, output growth, completed titles, measured recent speed, converted runtime, and remaining verification. Present sizes and speeds with automatically selected decimal units. Say when progress is not measurable; never invent precision or interrupt a process just to measure it.
-
-Keep the adaptive project monitor visible in the current assistant task terminal and updating about every two seconds throughout the task, including idle gaps and phase changes. It may observe only process metadata, paths inside the selected workspace, output growth, and free storage. Stopping or closing it must never stop or signal a rip, conversion, OCR, translation, or verification process. Chat updates remain required even while the display is running.
-
-Include the exact copy-ready adaptive-monitor command in the task-start or rip-start chat update so the user can paste it into the ChatGPT terminal or another local shell. Repeat it on request. A disc, phase, or output-path change must not require a new command.
-
-Pass an English phase description to the live monitor, for example `DVD 6 lossless mirror`. Keep every displayed label, warning, unit description, and completion message in English.
-
-Treat analysis, extraction, technical joining, identification, archive creation, compatible conversion, geometry checks, stream/transition checks, and QuickTime playback as separate phases. Report 100% only when every required phase for that disc is verified. Cross-disc stories may leave a compatible joined output pending while the current disc's source and archive work are complete.
-
-At handoff, state retained outputs, languages, durations, verification performed, warnings, unresolved work, and whether the user may insert the next disc. Update the workspace records before waiting.
+Treat acquisition, title mapping, same-episode joins/splits, MP4 creation, retained audio and subtitles, full decode, source comparison, and actual player tests as separate gates. A representative real-title USB pilot is required before claiming compatibility with a specific TV or audio setup; test language switching and surround when those features matter. A correct filename sort is not proof of the TV's `Next` behavior. Mark 100% only after every requested gate passes. Remove only source files for which this user explicitly authorized cleanup and whose content, retained streams, pending work, and all aliases were checked. At handoff, reconcile manifest and actual files; state verified outputs, source and audio retention, playback evidence, limitations, pending work, and whether the next disc may be inserted.

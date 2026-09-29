@@ -4,6 +4,8 @@
   "updated_at": null,
   "discs": [],
   "titles": [],
+  "source_retention_policy": "Unknown; retain original-stream sources until explicitly resolved",
+  "target_players": [],
   "read_errors": [],
   "verification_notes": [],
   "remaining_work": ["Detect and confirm a disc before acquisition"]

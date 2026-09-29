@@ -1,4 +1,4 @@
 interface:
-  display_name: "DVD Digitize & Archive"
-  short_description: "Rip, archive, convert, verify, and resume DVDs"
-  default_prompt: "Use $dvd-digitize-archive to process the inserted DVD, resume an existing workspace when available, and maintain verified MKV, MP4, manifest, status, and logs."
+  display_name: "Optical Disc Archive"
+  short_description: "Archive and verify DVD, Blu-ray, and UHD discs"
+  default_prompt: "Use $dvd-digitize-archive to inspect my inserted optical disc, resume an existing workspace when appropriate, and propose the verified MKV and MP4 workflow before acquisition."

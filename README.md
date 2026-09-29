@@ -1,10 +1,11 @@
-# DVD Digitize & Archive
+# Optical Disc Digitize & Archive
 
-An AI-assistant skill and local toolkit for evidence-based DVD archiving: preserve
-source streams in MKV, create H.264/AAC MP4 playback copies, keep resumable records,
-and observe progress without controlling the media processes.
+An AI-assistant skill and local toolkit for evidence-based DVD, Blu-ray, and UHD
+Blu-ray archiving. It preserves original streams in MKV, prepares source-matched
+MP4 playback candidates, maintains resumable records, and observes progress
+without controlling media processes.
 
-**This is an assisted workflow, not a one-click ripper.** It does not bundle DVD
+**This is an assisted workflow, not a one-click ripper.** It does not bundle optical
 readers, codecs, subtitle models, credentials, or copyrighted media. Use only with
 material you are authorized to process.
 
@@ -23,13 +24,13 @@ Set up https://github.com/Kian-hdr/dvd-digitize-archive on this computer for my 
 
 3. Run python3 scripts/check_prerequisites.py. If Python is missing, first arrange Python 3.9 or newer from an official source. Check FFmpeg and ffprobe, including libx264 and AAC support. Reuse compatible installations. Install only missing components needed for the safe synthetic test, using an existing trusted package manager or official downloads. Do not upgrade unrelated packages, replace configurations, disable security controls, enter credentials, purchase anything, upload media, or create accounts. Ask only for genuinely required information, permissions, administrator authentication, or consequential choices. If a dependency cannot be installed safely, explain the exact manual step and continue independent checks.
 
-4. macOS is the primary workflow; Linux is experimental and native Windows DVD operation is unsupported. Do not promise hardware access through WSL, a sandbox, or a remote assistant. An optical drive, MakeMKV or dvdbackup, OCR/transcription tools, external services, and paid licenses are optional for setup and must not be installed or activated just to pass the synthetic test. Explain any reader installation, license, hardware, or GUI steps needed before actual DVD use.
+4. macOS is the primary workflow; Linux physical-disc operation is experimental and native Windows operation is unsupported. Do not promise hardware access through WSL, a sandbox, or a remote assistant. A format-capable optical drive, MakeMKV or dvdbackup, OCR/transcription tools, external services, and paid licenses are optional for setup and must not be installed or activated just to pass the synthetic test. Explain any reader installation, license, hardware, or GUI steps needed before actual disc use.
 
 5. Use python3 scripts/install.py --dry-run --dest with an appropriate new absolute destination, then install there. This copies the whole package and refuses existing destinations. Detect and preserve any existing skill and assistant configuration; if a skill already exists, stage this version separately for review instead of replacing it. Register it only through the assistant's supported mechanism without overwriting configuration. If automatic discovery is unavailable, show me how to ask the assistant to read the installed SKILL.md directly. Never claim discovery was verified unless it was observed.
 
 6. In a fresh temporary workspace, run python3 -m unittest discover -s tests -v and python3 scripts/smoke_test.py from the downloaded repository, then repeat scripts/check_prerequisites.py and scripts/smoke_test.py from the installed copy. Test the monitor once with synthetic files. No disc access, ripping, personal-media scanning, cloud services, credentials, or paid resources are authorized by this setup prompt.
 
-7. Report installation paths, versions, checks passed/failed/skipped, preserved existing installations, manual steps, and remaining limitations. Give me an exact invocation for this assistant and a quoted monitor command using my resolved paths. Distinguish the synthetic codec/remux/decode tests from real-disc acquisition, title identification, subtitle quality, and actual player compatibility. Before any later DVD acquisition, identify the drive and disc, check storage and destination, and obtain my explicit confirmation of the physical disc.
+7. Report installation paths, versions, checks passed/failed/skipped, preserved existing installations, manual steps, and remaining limitations. Give me an exact invocation for this assistant and a quoted monitor command using my resolved paths. Distinguish the synthetic codec/remux/decode tests from real-disc acquisition, title identification, subtitle quality, and actual player compatibility. Before any later disc acquisition, verify format-capable drive/tool support, identify the drive and disc, check storage and destination, and obtain my explicit confirmation of the physical disc.
 ```
 <!-- SETUP_PROMPT_END -->
 
@@ -38,15 +39,16 @@ Set up https://github.com/Kian-hdr/dvd-digitize-archive on this computer for my 
 | Component | Required for |
 |---|---|
 | Python 3.9+ | Installer, monitors, tests; Python standard library only |
-| FFmpeg + ffprobe with libx264, AAC, MPEG-2 video, AC-3, and lavfi | Synthetic test; FFmpeg/ffprobe are also used for actual media processing |
+| FFmpeg + ffprobe with libx264, AAC, MPEG-2 video, AC-3, and lavfi | Existing synthetic setup test |
+| FFmpeg with libx265 and suitable input decoders | HEVC Main/Main10 creation from real source; check before that workflow |
 | Git or ZIP downloader | Getting the repository; no GitHub login needed |
 | zsh | Optional original monitor entry points; Python entry point needs no zsh |
-| AI coding assistant with local shell/filesystem access | Interpreting the skill and coordinating DVD work; manual use is possible |
-| DVD-capable optical drive and a suitable reader | Actual DVD acquisition only |
+| AI coding assistant with local shell/filesystem access | Interpreting the skill and coordinating optical-disc work; manual use is possible |
+| Format-capable optical drive and suitable reader | Actual disc acquisition only; UHD needs verified drive/tool support |
 | Target video player | Actual playback, geometry, A/V sync, and subtitle verification |
 
 macOS is the primary workflow. Python helpers also target Unix-like systems, but
-Linux DVD operations are experimental. Native Windows DVD operation is unsupported;
+Linux physical-disc operation is experimental. Native Windows operation is unsupported;
 WSL/VM/remote sessions do not imply access to the host optical drive or GUI.
 Read [VALIDATION.md](VALIDATION.md) for what was actually tested.
 
@@ -95,7 +97,7 @@ new skill-directory path to `--dest` instead. Do not copy over an existing skill
 Some assistants require reload/restart; confirm discovery in that assistant.
 You can also use the downloaded repository directly without installing a copy.
 
-## Quick start: no DVD needed
+## Quick start: no disc needed
 
 From the repository or installed copy:
 
@@ -108,7 +110,9 @@ The smoke test uses a new temporary directory, synthesizes two seconds of test
 pattern and tone, stream-copies an MPEG-2/AC-3 MKV, makes H.264/AAC MP4, checks
 compressed archive packet hashes, codecs, duration, geometry and full decode,
 and runs the monitor once. It then deletes only its own disposable files.
-It never enumerates a drive, reads a DVD, or scans personal media.
+It never enumerates a drive, reads a disc, or scans personal media. The smoke
+test remains an H.264/DVD-style toolchain check; it does not validate HEVC,
+Blu-ray/UHD acquisition, HDR, source audio mapping, or a target player.
 
 To retain a synthetic example and JSON report, choose a path that does not exist:
 
@@ -121,11 +125,11 @@ python3 scripts/monitor.py "$HOME/Movies/DVD_Archive_Synthetic_Demo" --once
 
 Tell your assistant, supplying the actual repository or installed skill path:
 
-> Read SKILL.md and its relevant references. Inspect my inserted DVD and propose
+> Read SKILL.md and its relevant references. Inspect my inserted disc and propose
 > a new archive under my Movies directory. Report the disc identity, destination,
 > available storage, and selected reader before asking me to confirm acquisition.
 
-> Read this skill and resume my existing DVD workspace. Reconcile WORKFLOW.md,
+> Read this skill and resume my existing optical-disc workspace. Reconcile WORKFLOW.md,
 > STATUS.md, manifest.json and disc logs with the actual files. Preserve verified
 > outputs and report unfinished work before continuing.
 
@@ -133,8 +137,9 @@ Tell your assistant, supplying the actual repository or installed skill path:
 > Preserve its archive and existing video/audio streams. Review OCR, timing, and
 > actual player switching before proposing a batch. Do not use cloud services.
 
-The assistant must inspect DVD structure before choosing titles or remux commands.
-Blind VOB concatenation is not a reliable generic archival recipe. Subtitle OCR,
+The assistant must inspect DVD title structure or Blu-ray playlist and segment
+structure before choosing sources or remux commands. Blind VOB concatenation is
+not a reliable generic archival recipe. Subtitle OCR,
 transcription, translation and linguistic review are workflows, not bundled engines.
 See [selectable-subtitles.md](references/selectable-subtitles.md).
 
@@ -163,9 +168,10 @@ explicitly verified byte total, use the fixed monitor described in
 - [MakeMKV](https://www.makemkv.com/download/) is the preferred reader when suitable
   and available. It is separate proprietary software; check current license,
   expiration, platform and installation requirements. No license keys are supplied.
-  The [Homebrew cask](https://formulae.brew.sh/cask/makemkv) lists a September 1, 2026
-  disable date. Use vendor instructions and review OS prompts; do not disable OS
-  protections to automate setup.
+  Check the current [Homebrew cask](https://formulae.brew.sh/cask/makemkv) status
+  if using Homebrew. Use vendor instructions and review OS prompts; do not disable
+  OS protections to automate setup. Blu-ray and UHD also require a drive and
+  tool combination that can read the actual disc.
 - [dvdbackup](https://dvdbackup.sourceforge.net/) is an alternative mirror tool.
   Its [Homebrew formula](https://formulae.brew.sh/formula/dvdbackup) is installed
   with `brew install dvdbackup` when this workflow is selected. A mirror still
@@ -180,19 +186,31 @@ None of these is required for the synthetic setup test. Authentication, license
 activation, administrator prompts, external account setup, and hardware connection
 cannot be promised unattended. Do not share private media in issue reports.
 
+For a real optical-disc session, start with `scripts/disc_snapshot.py` and a
+current MakeMKV drive scan. `scripts/makemkv_job.py` previews explicit title or
+Blu-ray backup commands and refuses existing output paths. Physical-disc
+acquisition requires confirming the inserted disc and selected drive first.
+After a complete source MKV is available, `scripts/media_audit.py` and
+`scripts/compare_audio_stream.py` record technical evidence;
+`scripts/compatible_encode.py` previews source-matched HEVC or legacy H.264
+candidate settings. Read the matching references before running those helpers.
+Their technical checks do not establish episode identity, visual quality, or
+actual player acceptance.
+
 ## Package contents
 
 - `SKILL.md`: complete workflow and safety/verification rules.
 - `agents/openai.yaml`: optional assistant display metadata.
-- `references/`: all five original workflow references, adapted for public use.
-- `scripts/`: Python installer, prerequisite report, synthetic smoke test, shared
-  monitor, and both original zsh monitor entry points.
+- `references/`: DVD, Blu-ray/UHD, title processing, subtitles, TV playback,
+  watch order, progress, workspace and parallel-work guidance.
+- `scripts/`: installer, prerequisite and synthetic checks, advisory monitor,
+  disc/title inspection, candidate encoding, audio and media audits, episode joins,
+  watch-view helpers, and both original zsh monitor entry points.
 - `templates/`: generic workflow, status, manifest, and disc-log starting points.
 - `tests/`: regression tests; `VALIDATION.md`: scoped evidence and limitations.
 - `LICENSE`, `ATTRIBUTION.md`, `CHANGELOG.md`: rights, provenance and changes.
 
-There were no source template files, assets, media or license notices to carry over.
-The generic templates and public packaging helpers were added for this release.
+No source media, credentials, device records or private workspace state are bundled.
 
 ## Limitations
 

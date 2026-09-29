@@ -4,7 +4,8 @@ Title and identity: Unknown. Confirm from disc evidence before naming.
 Tools and versions: Not inspected.
 
 - Archive original streams, chapters, geometry, and verified language tags in MKV.
-- MP4 default: H.264, CRF 18, medium, yuv420p, AAC; confirm interlacing and geometry.
+- MP4 candidate: choose target player, retained languages, and source-matched SDR profile. Preview HEVC Main/Main10 at CRF 18/medium when supported; use H.264 only as a documented 8-bit fallback. Confirm color, interlacing, geometry, audio and subtitle mapping.
+- Source retention and cleanup: Unknown. Keep original-stream MKVs and backups until the user decides and every requested verification gate passes.
 - Require explicit confirmation of each physical disc before acquisition.
 - One optical reader; preserve sources and verified outputs.
 - Record real exit statuses, read errors, full decode, visual and player checks.

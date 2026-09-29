@@ -13,6 +13,12 @@ templates, and replaces monitor internals with a shared Python implementation.
 The installed source skill was preserved separately. No real archive records,
 private media, credentials, or personal filesystem paths are included.
 
+The 1.1.0 update adapts later owner-authored optical-disc workflow files and
+helpers from the maintainer's installed skill. The public text omits local
+workspace paths, personal media examples, device observations and locally scoped
+cleanup permission. This repository's MIT license continues to cover only its
+original material; the external tools and media listed below remain separate.
+
 FFmpeg/ffprobe, MakeMKV, dvdbackup, libdvdcss, MKVToolNix, Tesseract, Whisper and
 other optional tools are independent projects. They are not bundled or relicensed
 by this repository. Their names acknowledge their respective projects; follow

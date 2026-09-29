@@ -1,5 +1,45 @@
 # Validation
 
+## Local 1.1.0 candidate validation: 2026-09-29
+
+Environment: macOS host (Darwin 27.0.0, arm64), Python 3.9.6,
+FFmpeg/ffprobe 9.0.1 with libx265 available. This section describes local
+candidate checks before public CI and release; the earlier 1.0.0 record below
+remains historical evidence for that version.
+
+Passed locally:
+
+- 41 standard-library tests, including a synthetic Blu-ray-structure fingerprint,
+  rejection of unknown and symlinked disc structure, MakeMKV scan preview without
+  touching the reader, a two-language synthetic source with an explicit German-only
+  H.264/AAC output, and a fully decoded HEVC Main 8-bit `hvc1` candidate. The
+  source remained intact; video-only mode rejected it because it contained audio.
+  A separate synthetic 10-bit SDR source passed Main10/yuv420p10le/hvc1 encoding,
+  bt709 tag checks, full decode, TV-profile audit, and source geometry/color
+  comparison. Watch-view tests confirmed new hardlinks, preservation of an existing
+  view and guide, rejection of a malformed offer before either is moved, and
+  preservation of a dangling `Watch_Order` symlink and both predictable
+  timestamped retention-name symlinks rather than replacing them.
+- The existing H.264/AAC DVD-style synthetic smoke test, packet-hash comparison,
+  full decode and one read-only monitor sample.
+- Python compilation, manifest JSON parsing, Markdown relative-link resolution,
+  matching README/setup prompt, `git diff --check`, and skill-creator
+  `quick_validate.py` (run with an isolated PyYAML dependency).
+- Bounded text scan of public files for personal paths, named media projects,
+  device observations, and common key patterns found none in the new material.
+- A fresh temporary non-overwriting installation, prerequisite check, and
+  synthetic smoke test from the installed copy. Its root `SKILL.md` matched the
+  repository and the new helper files were present.
+
+These synthetic checks do not verify real DVD, Blu-ray or UHD acquisition;
+protected-disc access; full-disc/playlist coverage; real-title HEVC/Main10
+quality or HDR;
+original multichannel/immersive audio preservation; subtitle OCR; real episode
+mapping; QuickTime or TV playback; or another assistant's installation/discovery.
+The setup smoke test still exercises H.264; separate tests cover short synthetic
+HEVC Main 8-bit and Main10 encodes. The new scripts have not yet run in public CI
+or against physical media.
+
 ## Local release validation: 2026-09-04
 
 Environment: macOS 26.6.2 (Darwin 25.6.0), Apple Silicon, Python 3.9.6,

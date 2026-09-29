@@ -4,16 +4,16 @@ Use this workflow when the user asks for optional source-language subtitles, OCR
 
 ## Scope and safety
 
-- Modify only compatible playback copies. Do not alter archival MKVs or lossless disc mirrors.
+- Modify only compatible playback candidates. Keep temporary MKVs or disc mirrors intact until requested subtitle tracks and the final MP4 are verified.
 - Inspect workspace documentation, actual streams, active processes, and existing subtitle artifacts before starting. Do not disrupt a healthy rip, encode, or verification process.
 - Work from local files and do not access the optical drive unless the user separately authorizes disc access.
 - Never overwrite a verified MP4. Create a separately named candidate, verify it, quarantine the superseded file reversibly, and only then promote the candidate to the canonical path.
 - Copy existing video and audio streams during subtitle integration. Do not re-encode them merely to add subtitles.
 - Do not upload media, audio, or subtitles to an external service without explicit authorization.
 
-## Coordinator-led subtitle swarm
+## Bounded subtitle work
 
-Use bounded swarm orchestration for all subtitle extraction, OCR, transcription, correction, translation, and verification work. If agents are unavailable, preserve the same coordinator, cluster ownership, serialization, and independent-review boundaries locally.
+Use a coordinator for subtitle extraction, OCR, transcription, correction, translation, and verification. For one short title or a small cue set, work sequentially and reuse local files and deterministic validators. Split into parallel workers only when independent clusters are ready and measured throughput or review coverage justifies the context and coordination cost. If agents are unavailable, preserve the same ownership and independent-review boundaries locally.
 
 The coordinator exclusively owns:
 
@@ -26,7 +26,7 @@ Workers never edit shared workflow, status, manifest, or technical logs. They re
 
 Split work at confirmed chapter or scene boundaries when possible. Each authored cue belongs to exactly one cluster. Supply a small read-only context window from the preceding and following cluster plus one shared glossary for names, ranks, locations, recurring phrases, and technical terms. Context cues must never be emitted twice. Do not split a dialogue exchange when a nearby safe boundary is available.
 
-Start with no more than two simultaneous OCR, transcription, or translation model jobs. Increase concurrency only when aggregate completed cues per minute improves without harmful memory pressure, swapping, thermal constraint, storage pressure, stalled output, or interference with an existing media process. Reduce concurrency when those conditions deteriorate. Do not interrupt or restart a healthy process solely to convert it into clustered work; let it finish, verify its result, and apply clustering to remaining work.
+When parallel work is justified, start with no more than two simultaneous OCR, transcription, or translation model jobs. Increase concurrency only when aggregate completed cues per minute improves without harmful memory pressure, swapping, thermal constraint, storage pressure, stalled output, or interference with an existing media process. Reduce concurrency when those conditions deteriorate. Do not interrupt or restart a healthy process solely to convert it into clustered work; let it finish, verify its result, and apply clustering to remaining work. Pass cue IDs, short adjacent context, and one glossary version rather than entire episode transcripts to each worker.
 
 Use separate responsibilities where work exists:
 
@@ -44,13 +44,13 @@ The coordinator may combine lightweight roles when the workload is small, but th
 
 Use the highest reliable source available, in this order:
 
-1. Existing text subtitles in the MP4, archive MKV, local mirror, or verified sidecar.
-2. Original bitmap DVD subtitles extracted from the archive MKV or local mirror and converted through reliable OCR.
+1. Existing text subtitles in the MP4, temporary MKV, local mirror, or verified sidecar.
+2. Original bitmap DVD VobSub or Blu-ray PGS subtitles extracted from the temporary MKV or local source and converted through reliable OCR.
 3. Audio transcription only when no usable source subtitle exists.
 
 Record whether each subtitle came from an original text track, bitmap OCR, or audio transcription. An OCR or transcript is not verified merely because a tool completed successfully.
 
-For bitmap OCR, review names, punctuation, character substitutions, line breaks, overlaps, missing captions, timing, opening and closing credits, and chapter transitions. For transcription, use the known spoken language rather than automatic detection, retain usable timestamps, and prefer the most accurate locally practical model. Use an appropriate local transcription engine, such as a suitable Whisper implementation, only after verifying its installed capabilities and model requirements. Do not install or invoke a cloud service without authorization.
+For bitmap OCR, review names, punctuation, character substitutions, line breaks, overlaps, missing captions, timing, opening and closing credits, and chapter transitions. For transcription, use the known spoken language rather than automatic detection, retain usable timestamps, and prefer the most accurate locally practical model. Wispr Flow is not assumed to support file transcription; use it only if its installed capabilities are verified for the task. Otherwise use an appropriate local transcription engine such as a high-accuracy Whisper implementation. Do not install or invoke a cloud service without authorization.
 
 ## Translated subtitles
 
@@ -59,7 +59,7 @@ Create a translated track only when the user requests it and the source-language
 - Translate meaning and tone naturally while preserving names and established terminology.
 - Reuse the verified source timing, then adjust line breaks and text length for readability without changing scene alignment.
 - Label the track with the correct target-language code and title.
-- Document it as a derived translation. Do not imply that the DVD contained a dub or original subtitle in that language.
+- Document it as a derived translation. Do not imply that the disc contained a dub or original subtitle in that language.
 - Do not invent an audio track, official localized title, or official translation.
 - Translate reviewed clusters concurrently only within the coordinator's measured limit. Keep cue identifiers and source timestamps stable through translation so the coordinator can assemble results deterministically.
 - Apply one coordinator-owned glossary across every cluster and future episode in the same series. Record glossary changes and recheck already translated clusters when a changed term affects them.
@@ -70,8 +70,8 @@ Keep reviewed sidecars in a factual workspace location such as:
 
 ```text
 Subtitles/Season_01/
-  S01E01_Title_English.srt
-  S01E01_Title_German.srt
+  S01E01_Opening_Episode_Series_Name_Year_English.srt
+  S01E01_Opening_Episode_Series_Name_Year_German.srt
 ```
 
 Use MP4-compatible selectable text subtitles, normally `mov_text`/`tx3g`. Do not burn subtitles into the video. For an English source track and a user-requested German translation, use:
@@ -85,7 +85,7 @@ Preserve video, audio, chapters, duration, frame rate, resolution, SAR/DAR, defa
 
 Process one episode as a pilot before a batch unless the user explicitly chooses another scope. Promote or batch only after the pilot passes.
 
-For the pilot, measure completed cues per minute, peak memory pressure, model concurrency, correction rate, and merge defects. Use those measurements to choose concurrency for future episodes instead of assuming that more workers are faster. Do not begin the remaining episode batch until the assembled English and requested translated tracks pass the complete pilot gate.
+For the pilot, measure completed cues per minute, peak memory pressure, correction rate, and merge defects; record model concurrency only when parallel workers are used. Use those measurements to choose concurrency for future episodes instead of assuming that more workers are faster. Do not begin the remaining episode batch until the assembled source and requested translated tracks pass the complete pilot gate.
 
 For every candidate:
 
@@ -95,7 +95,7 @@ For every candidate:
 4. Check caption counts, first and last timestamps, overlaps, invalid or out-of-range cues, and representative synchronization at the beginning, middle, end, chapters, and warning locations.
 5. Review source-language accuracy and translated meaning, names, punctuation, encoding, umlauts, and line readability. Automated translation alone is not sufficient verification.
 6. Verify cluster assembly: every expected cue appears exactly once, cluster boundaries contain no truncated dialogue, cue numbering is continuous, and shared context produced no duplicated text.
-7. Fully decode video and audio and record the result.
+7. Fully decode video and audio with `scripts/media_audit.py --decode` and record the result.
 8. Open the candidate in QuickTime Player. Play multiple positions and verify that each subtitle appears, can be switched independently, can be disabled, remains synchronized, and renders special characters correctly.
 9. When practical, test another target television or Apple-compatible player. Record the test as unavailable rather than assuming compatibility when no device is accessible.
 
@@ -117,3 +117,4 @@ Update the workspace workflow, status, manifest, relevant disc log, and technica
 - cluster boundaries, worker ownership, glossary version, concurrency used, measured throughput, independent-review result, and merge gap/duplicate checks.
 
 Do not mark a subtitle verified until its content, timing, metadata, selectability, disable behavior, and required playback checks have actually passed.
+Do not clear the temporary source until all requested subtitles are embedded or a documented user decision resolves an unsupported source track.

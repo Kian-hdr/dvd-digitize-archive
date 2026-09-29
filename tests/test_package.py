@@ -199,11 +199,15 @@ class PackageTests(unittest.TestCase):
     def test_no_private_paths_or_key_material(self):
         patterns = [r'/Users/[^/\s]+/', r'/home/[^/\s]+/', r'-----BEGIN .*PRIVATE KEY-----',
                     r'gh[pousr]_[A-Za-z0-9]{30,}', r'AKIA[A-Z0-9]{16}']
-        for directory in ('references', 'agents', 'templates'):
+        for directory in ('references', 'agents', 'templates', 'scripts'):
             for path in (ROOT / directory).rglob('*'):
                 if path.is_file():
                     for pattern in patterns:
                         self.assertIsNone(re.search(pattern, path.read_text()), str(path))
+        for name in ('SKILL.md', 'README.md', 'SETUP_PROMPT.md', 'VALIDATION.md',
+                     'CHANGELOG.md', 'ATTRIBUTION.md'):
+            for pattern in patterns:
+                self.assertIsNone(re.search(pattern, (ROOT / name).read_text()), name)
 
     def test_smoke_existing_destination_preserved(self):
         if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):
