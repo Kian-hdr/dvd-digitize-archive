@@ -9,6 +9,8 @@ without controlling media processes.
 readers, codecs, subtitle models, credentials, or copyrighted media. Use only with
 material you are authorized to process.
 
+[Assistant setup](#set-up-with-an-ai-assistant) · [Quick start](#quick-start-no-disc-needed) · [Requirements](#requirements)
+
 ## Set up with an AI assistant
 
 Copy the following prompt into an assistant with terminal/filesystem access. The
