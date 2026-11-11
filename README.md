@@ -1,4 +1,4 @@
-# Optical Disc Digitize & Archive
+<p align="center"><strong>Optical Disc Digitize &amp; Archive</strong></p>
 
 An AI-assistant skill and local toolkit for evidence-based DVD, Blu-ray, and UHD
 Blu-ray archiving. It preserves original streams in MKV, prepares source-matched
